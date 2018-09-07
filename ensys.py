@@ -1,26 +1,24 @@
 #-*- coding=utf-8 -*-
-
+#!/usr/bin/python
 import MySQLdb as mdb
 import sys, xlrd
 from openpyxl import load_workbook
 import time, threading
-from pygments.lexers import _tsql_builtins
+import netsnmp
+#from pygments.lexers import _tsql_builtins
 
 #
 #
 
 
-conn = mdb.connect(host = "127.0.0.1",
-                   user = 'root',
-                   passwd = '123456',
-                   db = 'enpdu')
+#conn = mdb.connect(host = "127.0.0.1", user = 'root', passwd = '123456', db = 'test')
 
-cursor = conn.cursor()
-cursor.execute('SELECT VERSION()')
-data = cursor.fetchone()
+#cursor = conn.cursor()
+#cursor.execute('SELECT VERSION()')
+#data = cursor.fetchone()
 
 
-db_lock = threading.Lock()
+#db_lock = threading.Lock()
 
 def db_insert_data(db, sql, val):           #执行SQL语句，插入数据
     try:
@@ -148,12 +146,13 @@ def start_check_sensor_thread():
     t2.start()
     t.join()
     t2.join()    
-    
-def main():
-    print ("Database version : %s " % data)
-    conn.close()
-    
-    
+
+def snmp_test():
+    var = netsnmp.Varbind(".1.3.6.1.4.1.19536.10.1.4.7.1.2")
+    res = netsnmp.snmpwalk(var, Version = 1, DestHost = '192.168.1.101', Community = 'public')
+    print(res)
+ #snmpget -v3 -a MD5 -A "12345678" -l authPriv -u admin -x DES -X "12345678" 192.168.1.101 -c public .1.3.6.1.4.1.19536.10.1.4.7.1.2.1.1
+ #snmpget -v1 192.168.1.101 -c public .1.3.6.1.4.1.19536.10.1.4.7.1.2.1.1   
 if __name__ == '__main__':
     #db_get_data('`Card Number`','user')
     #db_insert_data(('test','222332',1234,1),'user')
@@ -161,8 +160,9 @@ if __name__ == '__main__':
     #wb = open_excel("pdulist.xlsx")
     #copy_excel_pdu_list(wb)
     #db_insert_data1()
-    db_get_data_pdu_list(1, "`pdu list`")
-    main()
+    #db_get_data_pdu_list(1, "`pdu list`")
+    snmp_test()
+
 
 
 
